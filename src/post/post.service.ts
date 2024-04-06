@@ -111,6 +111,7 @@ export class PostService {
     const images = await this.generate5Images(prompt.story);
     // TODO: logic to add rewards
     const newPost = {
+      title: prompt.title,
       images,
       createdBy: _id,
       backstory: prompt,

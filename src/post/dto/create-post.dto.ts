@@ -8,6 +8,9 @@ export class SinglePostDto {
 
 export class CreatePostDto {
   @IsString()
+  title: string;
+
+  @IsString()
   story: string;
 
   @IsDateString()
