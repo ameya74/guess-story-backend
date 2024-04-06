@@ -1,22 +1,18 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import bcrypt from 'bcrypt';
+import { Role } from 'src/_common/types.global';
 
-interface UserDoc extends Document {
-  username: string;
-  password: string;
-  walletAddress?: string;
-  validPassword(password: string): boolean;
+export interface UserDoc extends Document {
+  role: Role;
+  walletAddress: string;
 }
 
-const userSchema: Schema = new Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  walletAddress: { type: String, required: false, unique: true },
-});
-
-userSchema.methods.validPassword = function (password: string): boolean {
-  return bcrypt.compareSync(password, this.password);
-};
+const userSchema: Schema = new Schema(
+  {
+    role: { type: String, required: true, default: Role.User },
+    walletAddress: { type: String, required: true, unique: true },
+  },
+  { timestamps: true },
+);
 
 const User = mongoose.model<UserDoc>('User', userSchema);
 export { User };

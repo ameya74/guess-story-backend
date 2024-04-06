@@ -11,6 +11,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MongoDbModule } from './_common/database/mongoDB.module';
 import { UsersModule } from './users/users.module';
+import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { UsersModule } from './users/users.module';
     }),
     MongoDbModule,
     UsersModule,
+    PostModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
