@@ -77,18 +77,18 @@ export class PostService {
       let imageUrl = '';
       while (!imageUrl) {
         const {
-          data: { images /*, status*/ },
+          data: { images, status },
         } = await lastValueFrom(
           this.httpService.get(
             `${this.ImageApiUrl}/guest-watch-process/${uuid}`,
           ),
         );
 
-        // if (status === 'processing') {
-        //   await new Promise((resolve) => setTimeout(resolve, 1000));
-        // } else {
-        imageUrl = images[0];
-        // }
+        if (status === 'processing') {
+          //   await new Promise((resolve) => setTimeout(resolve, 1000));
+          // } else {
+          imageUrl = images[0];
+        }
       }
 
       return `${this.ImageApiUrl}${imageUrl}`;
