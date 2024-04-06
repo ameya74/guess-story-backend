@@ -9,6 +9,7 @@ import { PostDocument } from 'src/_common/database/schema/post.schema';
 import { UserDocument } from 'src/_common/database/schema/user.schema';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
+import { CreatePostDto } from './dto/create-post.dto';
 
 @Injectable()
 export class PostService {
@@ -105,14 +106,15 @@ export class PostService {
     return images.filter((image) => image !== null) as string[];
   }
 
-  async createPost(walletAddress: string, prompt: string) {
+  async createPost(walletAddress: string, prompt: CreatePostDto) {
     const { _id } = await this.userQueryService.readEntity({ walletAddress });
-    const images = await this.generate5Images(prompt);
+    const images = await this.generate5Images(prompt.story);
     // TODO: logic to add rewards
     const newPost = {
       images,
       createdBy: _id,
       backstory: prompt,
+      endDate: prompt.endDate,
     };
 
     const post = await this.postQueryService.createEntity(newPost);
@@ -127,7 +129,16 @@ export class PostService {
     return this.postQueryService.readEntity({ _id: id });
   }
 
-  async remove(id: string) {
-    return this.postQueryService.deleteEntity({ _id: id });
+  async remove(id: string, walletAddress: string) {
+    const { _id } = await this.userQueryService.readEntity({ walletAddress });
+    if (
+      await this.postQueryService.checkValidity({ _id: id, createdBy: _id })
+    ) {
+      return this.postQueryService.deleteEntity({ _id: id });
+    }
+    return {
+      success: false,
+      message: 'You are not authorized to delete this post.',
+    };
   }
 }

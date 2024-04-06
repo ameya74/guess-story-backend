@@ -113,6 +113,39 @@ export class CommentService {
   }
 
   async createComment(walletAddress: string, comment: string, postId: string) {
+    const { _id } = await this.userQueryService.readEntity({ walletAddress });
+    const post = await this.postQueryService.readEntity({ _id: postId });
+
+    if (!post) {
+      return {
+        success: false,
+        message: 'Post does not exist.',
+      };
+    }
+
+    // check whether current date is after the end date of the post
+    const currentDate = new Date();
+    const endDate = new Date(post.endDate);
+    if (currentDate > endDate) {
+      return {
+        success: false,
+        message: 'Comment period for this post has ended.',
+      };
+    }
+
+    // check if a comment already exists for the user and post
+    const existingComment = await this.commentQueryService.readEntity({
+      userId: _id,
+      postId,
+    });
+
+    if (existingComment) {
+      return {
+        success: false,
+        message: 'Comment already exists for this post.',
+      };
+    }
+
     const commentLength = comment.trim().split(/\s+/).length;
     const isValidLength = commentLength >= 50 && commentLength <= 200;
 
@@ -123,7 +156,6 @@ export class CommentService {
       };
     }
 
-    const { _id } = await this.userQueryService.readEntity({ walletAddress });
     const rating = await this.getRating(comment, postId);
     const newComment = {
       userId: _id,
@@ -136,5 +168,14 @@ export class CommentService {
 
   async getAllCommentsforPost(postId: string) {
     return this.commentQueryService.readMultipleEntities({ postId });
+  }
+
+  async getUserComment(walletAddress: string, postId: string) {
+    const { _id } = await this.userQueryService.readEntity({ walletAddress });
+    return this.commentQueryService.readEntity({ userId: _id, postId });
+  }
+
+  async getWinners(postId: string) {
+    return this.commentQueryService.getTopComments(postId);
   }
 }
