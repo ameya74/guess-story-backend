@@ -1,19 +1,22 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types, HydratedDocument } from 'mongoose';
 
-export interface PostDoc extends Document {
-  createdBy: string;
+export interface IPost extends Document {
+  createdBy: Types.ObjectId;
   backstory: string;
   images: string[];
+  endDate: Date;
 }
 
-const postSchema: Schema = new Schema(
+export const modelName = 'Post';
+
+export type PostDocument = HydratedDocument<IPost>;
+
+export const PostSchema: Schema = new Schema<IPost>(
   {
     createdBy: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
     backstory: { type: String, required: true },
     images: { type: [String], required: true },
+    endDate: { type: Date, required: true },
   },
   { timestamps: true },
 );
-
-const Post = mongoose.model<PostDoc>('Post', postSchema);
-export { Post };

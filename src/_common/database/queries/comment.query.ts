@@ -1,9 +1,9 @@
 import { Model } from 'mongoose';
 import { GenericQueryService } from './_generic.query';
-import { CommentDoc } from '../schema/comment.schema';
+import { CommentDocument, modelName } from '../schema/comment.schema';
 
-export default class CommentQueryService extends GenericQueryService<CommentDoc> {
-  constructor(model: Model<CommentDoc>) {
-    super(model, 'Comment');
+export default class CommentQueryService extends GenericQueryService<CommentDocument> {
+  constructor(model: Model<CommentDocument>) {
+    super(model, modelName);
   }
 }

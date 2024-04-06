@@ -1,10 +1,10 @@
 import { Model } from 'mongoose';
 import { GenericQueryService } from './_generic.query';
-import { PostDoc } from '../schema/post.schema';
+import { PostDocument, modelName } from '../schema/post.schema';
 
-export default class PostQueryService extends GenericQueryService<PostDoc> {
-  constructor(model: Model<PostDoc>) {
-    super(model, 'Post');
+export default class PostQueryService extends GenericQueryService<PostDocument> {
+  constructor(model: Model<PostDocument>) {
+    super(model, modelName);
   }
 
   async getAllPosts() {

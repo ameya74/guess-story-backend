@@ -1,16 +1,10 @@
 import { ModelDefinition } from '@nestjs/mongoose';
-import { User } from './user.schema';
-import { Post } from './post.schema';
-import { Comment } from './comment.schema';
+import { UserSchema, modelName as UserModelName } from './user.schema';
+import { PostSchema, modelName as PostModelName } from './post.schema';
+import { CommentSchema, modelName as CommentModelName } from './comment.schema';
 
 export const UsersModelDefs: Array<ModelDefinition> = [
-  { name: 'User', schema: User },
-];
-
-export const PostModelDefs: Array<ModelDefinition> = [
-  { name: 'Post', schema: Post },
-];
-
-export const CommentModelDefs: Array<ModelDefinition> = [
-  { name: 'Comment', schema: Comment },
+  { name: UserModelName, schema: UserSchema },
+  { name: PostModelName, schema: PostSchema },
+  { name: CommentModelName, schema: CommentSchema },
 ];

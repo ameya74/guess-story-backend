@@ -1,13 +1,17 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, HydratedDocument, Types } from 'mongoose';
 
-export interface CommentDoc extends Document {
-  userId: string;
-  postId: string;
+export interface IComment extends Document {
+  userId: Types.ObjectId;
+  postId: Types.ObjectId;
   guessedBackstory: string;
   rating: number;
 }
 
-const commentSchema: Schema = new Schema(
+export const modelName = 'Comment';
+
+export type CommentDocument = HydratedDocument<IComment>;
+
+export const CommentSchema: Schema = new Schema<IComment>(
   {
     userId: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
     postId: { type: mongoose.Schema.ObjectId, ref: 'Post', required: true },
@@ -18,6 +22,3 @@ const commentSchema: Schema = new Schema(
     timestamps: true,
   },
 );
-
-const Comment = mongoose.model<CommentDoc>('Comment', commentSchema);
-export { Comment };

@@ -5,9 +5,10 @@ import { HttpService } from '@nestjs/axios';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import PostQueryService from 'src/_common/database/queries/post.query';
 import UserQueryService from 'src/_common/database/queries/user.query';
-import { PostDoc } from 'src/_common/database/schema/post.schema';
-import { UserDoc } from 'src/_common/database/schema/user.schema';
+import { PostDocument } from 'src/_common/database/schema/post.schema';
+import { UserDocument } from 'src/_common/database/schema/user.schema';
 import { ConfigService } from '@nestjs/config';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class PostService {
@@ -17,8 +18,8 @@ export class PostService {
   constructor(
     private httpService: HttpService,
     private configService: ConfigService,
-    @InjectModel('Post') PostModel: Model<PostDoc>,
-    @InjectModel('User') UserModel: Model<UserDoc>,
+    @InjectModel('Post') PostModel: Model<PostDocument>,
+    @InjectModel('User') UserModel: Model<UserDocument>,
   ) {
     this.httpService = httpService;
     this.configService = configService;
@@ -62,14 +63,51 @@ export class PostService {
     }
   }
 
-  async generateImages(prompts: string) {
-    // TODO: logic to generate images from the prompts
-    // const imagePrompts: string[] = await this.generate5prompts(prompts);
+  async generateImage(prompt: string): Promise<string | null> {
+    try {
+      const {
+        data: { uuid },
+      } = await lastValueFrom(
+        this.httpService.post(`${this.ImageApiUrl}/guest-generate-image`, {
+          prompt,
+        }),
+      );
+
+      let imageUrl = '';
+      while (!imageUrl) {
+        const {
+          data: { images /*, status*/ },
+        } = await lastValueFrom(
+          this.httpService.get(
+            `${this.ImageApiUrl}/guest-watch-process/${uuid}`,
+          ),
+        );
+
+        // if (status === 'processing') {
+        //   await new Promise((resolve) => setTimeout(resolve, 1000));
+        // } else {
+        imageUrl = images[0];
+        // }
+      }
+
+      return `${this.ImageApiUrl}${imageUrl}`;
+    } catch (error) {
+      console.error('Error generating image:', error);
+      return null;
+    }
+  }
+
+  async generate5Images(story: string): Promise<string[]> {
+    const prompts = await this.generate5prompts(story);
+    const images = await Promise.all(
+      prompts.map((prompt) => this.generateImage(prompt)),
+    );
+    return images.filter((image) => image !== null) as string[];
   }
 
   async createPost(walletAddress: string, prompt: string) {
-    const images = await this.generateImages(prompt);
     const { _id } = await this.userQueryService.readEntity({ walletAddress });
+    const images = await this.generate5Images(prompt);
     // TODO: logic to add rewards
     const newPost = {
       images,

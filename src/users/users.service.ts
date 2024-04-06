@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import UserQueryService from 'src/_common/database/queries/user.query';
-import { UserDoc } from 'src/_common/database/schema/user.schema';
+import { UserDocument } from 'src/_common/database/schema/user.schema';
 import { Role } from 'src/_common/types.global';
 import { ConnectWalletDto } from './dto/create-user.dto';
 
@@ -12,7 +12,7 @@ export class UsersService {
   userQueryService: UserQueryService;
   constructor(
     private readonly jwtService: JwtService,
-    @InjectModel('User') UserModel: Model<UserDoc>,
+    @InjectModel('User') UserModel: Model<UserDocument>,
   ) {
     this.userQueryService = new UserQueryService(UserModel);
   }
@@ -48,11 +48,11 @@ export class UsersService {
     return { accessToken: jwt, refreshToken: null };
   }
 
-  async getUserProfile(walletAddress: string): Promise<UserDoc> {
+  async getUserProfile(walletAddress: string): Promise<UserDocument> {
     return this.userQueryService.readEntity({ walletAddress });
   }
 
-  async getUser(_id: string): Promise<UserDoc> {
+  async getUser(_id: string): Promise<UserDocument> {
     return this.userQueryService.readEntity({ _id });
   }
 }
