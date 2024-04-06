@@ -6,7 +6,7 @@ export class CreateCommentDto {
   story: string;
 
   @Validate(IsObjectId)
-  id: string;
+  postId: string;
 }
 
 export class SingleCommentDto {

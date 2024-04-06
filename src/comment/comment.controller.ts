@@ -26,7 +26,7 @@ export class CommentController {
     return this.commentService.createComment(
       req.walletAddress.toLowerCase(),
       createCommentDto.story,
-      createCommentDto.id,
+      createCommentDto.postId,
     );
   }
 
