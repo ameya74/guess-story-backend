@@ -1,6 +1,7 @@
 import { ModelDefinition } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Post } from './post.schema';
+import { Comment } from './comment.schema';
 
 export const UsersModelDefs: Array<ModelDefinition> = [
   { name: 'User', schema: User },

@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-interface CommentDoc extends Document {
+export interface CommentDoc extends Document {
   userId: string;
   postId: string;
   guessedBackstory: string;
