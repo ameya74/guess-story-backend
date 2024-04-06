@@ -46,7 +46,6 @@ export class CommentController {
   }
 
   @Get('winners/:id')
-  @UseGuards(AuthGuard)
   getWinnerComment(@Param() { id }: SinglePostDto) {
     return this.commentService.getWinners(id);
   }

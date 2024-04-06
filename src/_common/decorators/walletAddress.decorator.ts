@@ -2,7 +2,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import ethers from 'ethers';
+import { ethers } from 'ethers';
 
 @ValidatorConstraint({ async: false })
 export class IsWalletAddress implements ValidatorConstraintInterface {

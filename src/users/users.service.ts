@@ -19,7 +19,7 @@ export class UsersService {
 
   generateJWT(obj: object, type: 'access' | 'refresh'): string {
     if (type === 'access')
-      return this.jwtService.sign(obj, { expiresIn: '1h' });
+      return this.jwtService.sign(obj, { expiresIn: '1d' });
     return this.jwtService.sign(obj, { expiresIn: '7d' });
   }
 

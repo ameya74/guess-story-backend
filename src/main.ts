@@ -4,6 +4,7 @@ import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import cookieParser = require('cookie-parser');
 import helmet from 'helmet';
+import { HttpExceptionFilter } from './_common/exceptions/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +13,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.use(helmet());
   app.use(cookieParser());
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
