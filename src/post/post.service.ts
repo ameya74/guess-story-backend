@@ -52,6 +52,7 @@ export class PostService {
     try {
       const parsedArray = JSON.parse(response.text());
       if (Array.isArray(parsedArray) && parsedArray.length >= 5) {
+        console.log('Parsed array:', parsedArray.slice(0, 5));
         return parsedArray.slice(0, 5);
       } else {
         throw new Error(
@@ -73,9 +74,13 @@ export class PostService {
           prompt,
         }),
       );
+      console.log('UUID:', uuid);
 
+      let retries = 0;
       let imageUrl = '';
-      while (!imageUrl) {
+
+      while (!imageUrl && retries < 10) {
+        // Max retries set to 10, adjust as needed
         const {
           data: { images, status },
         } = await lastValueFrom(
@@ -84,13 +89,22 @@ export class PostService {
           ),
         );
 
-        if (status === 'processing') {
-          //   await new Promise((resolve) => setTimeout(resolve, 1000));
-          // } else {
+        if (status === 'processing' && images.length === 0) {
+          // If status is still processing and images are not available yet, wait for a moment before checking again
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          retries++;
+        } else if (images.length > 0) {
+          // If images are available, set the imageUrl and exit the loop
           imageUrl = images[0];
         }
       }
 
+      if (!imageUrl) {
+        console.log('Image not available within the specified retries.');
+        return '';
+      }
+
+      console.log(`${this.ImageApiUrl}${imageUrl}`);
       return `${this.ImageApiUrl}${imageUrl}`;
     } catch (error) {
       console.error('Error generating image:', error);
@@ -100,10 +114,20 @@ export class PostService {
 
   async generate5Images(story: string): Promise<string[]> {
     const prompts = await this.generate5prompts(story);
+    // const prompts = [
+    //   'Portray overjoyed Henry indulging in a hearty serving of freshly cooked beans on a Friday afternoon.',
+    //   'Depict an idyllic setting where Henry savors a cup of delectable hot chocolate alongside his beloved beans.',
+    //   "Create an image of Henry's joyful face as he experiences pure bliss with every bite of his favorite food.",
+    //   'Capture the moment when Henry receives an unexpected surprise of chocolate-infused beans, eliciting an expression of pure delight.',
+    //   "Showcase a scene where Henry's contented demeanor reflects the simple yet profound pleasure he derives from beans."
+    // ];
     const images = await Promise.all(
-      prompts.map((prompt) => this.generateImage(prompt)),
+      prompts.map(async (prompt) => {
+        return await this.generateImage(prompt);
+      }),
     );
-    return images.filter((image) => image !== null) as string[];
+    console.log('Images:', images);
+    return images;
   }
 
   async createPost(walletAddress: string, prompt: CreatePostDto) {
@@ -114,7 +138,7 @@ export class PostService {
       title: prompt.title,
       images,
       createdBy: _id,
-      backstory: prompt,
+      backstory: prompt.story,
       endDate: prompt.endDate,
     };
 

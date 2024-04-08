@@ -113,6 +113,15 @@ export class CommentService {
   }
 
   async createComment(walletAddress: string, comment: string, postId: string) {
+    const commentLength = comment.trim().split(/\s+/).length;
+    const isValidLength = commentLength >= 10 && commentLength <= 200;
+
+    if (!isValidLength) {
+      return {
+        success: false,
+        message: 'Comment must be between 50 and 200 words.',
+      };
+    }
     const { _id } = await this.userQueryService.readEntity({ walletAddress });
     const post = await this.postQueryService.readEntity({ _id: postId });
 
@@ -134,27 +143,17 @@ export class CommentService {
     }
 
     // check if a comment already exists for the user and post
-    const existingComment = await this.commentQueryService.readEntity({
-      userId: _id,
-      postId,
-    });
+    // const existingComment = await this.commentQueryService.readEntity({
+    //   userId: _id,
+    //   postId,
+    // });
 
-    if (existingComment) {
-      return {
-        success: false,
-        message: 'Comment already exists for this post.',
-      };
-    }
-
-    const commentLength = comment.trim().split(/\s+/).length;
-    const isValidLength = commentLength >= 50 && commentLength <= 200;
-
-    if (!isValidLength) {
-      return {
-        success: false,
-        message: 'Comment must be between 50 and 200 words.',
-      };
-    }
+    // if (existingComment) {
+    //   return {
+    //     success: false,
+    //     message: 'Comment already exists for this post.',
+    //   };
+    // }
 
     const rating = await this.getRating(comment, postId);
     const newComment = {
