@@ -143,17 +143,17 @@ export class CommentService {
     }
 
     // check if a comment already exists for the user and post
-    // const existingComment = await this.commentQueryService.readEntity({
-    //   userId: _id,
-    //   postId,
-    // });
+    const existingComment = await this.commentQueryService.checkValidity({
+      userId: _id,
+      postId,
+    });
 
-    // if (existingComment) {
-    //   return {
-    //     success: false,
-    //     message: 'Comment already exists for this post.',
-    //   };
-    // }
+    if (!existingComment) {
+      return {
+        success: false,
+        message: 'Comment already exists for this post.',
+      };
+    }
 
     const rating = await this.getRating(comment, postId);
     const newComment = {
