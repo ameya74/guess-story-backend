@@ -175,6 +175,16 @@ export class CommentService {
   }
 
   async getWinners(postId: string) {
-    return this.commentQueryService.getTopComments(postId);
+    const topComments = this.commentQueryService.getTopComments(postId);
+    const winners = Promise.all(
+      (await topComments).map(async (comment) => {
+        const user = await this.userQueryService.readEntity({
+          _id: comment.userId,
+        });
+        return user.walletAddress;
+      }),
+    );
+    console.log(winners);
+    return winners;
   }
 }
