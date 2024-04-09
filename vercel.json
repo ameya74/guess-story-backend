@@ -1,0 +1,25 @@
+{
+    "version": 2,
+    "name": "guesser-backend",
+    "builds": [
+      {
+        "src": "nest build",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/dist/main.ts"
+      }
+    ],
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "functions": {
+      "preBuild": {
+        "command": "npm run build"
+      }
+    }
+  }
+  
